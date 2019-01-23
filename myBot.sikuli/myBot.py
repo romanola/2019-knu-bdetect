@@ -30,6 +30,7 @@ def getHeroLocation():
     y = 364
     return x, y
 
+
 def getRegion():
     a = (144, 339)
     b = (144, 46)
@@ -37,9 +38,11 @@ def getRegion():
     d = (753, 339)
     return a, b, c, d
 
+
 def getRandomAngle():
     angle = rd.randrange(10000)
     return angle % 360
+
 
 def findAllBitcoins():
     bitcoins = findAll(Pattern("bitcoin-1.png").similar(0.38))
@@ -56,6 +59,7 @@ def findAllMonsters():
         monsterList.append((i.getX(), i.getY()))
     return monsterList
 
+
 def check():
     return findAllBitcoins() != [] or findAllMonsters() != []
 
@@ -63,8 +67,9 @@ def check():
 def findBestMove():
     x0, y0 = getHeroLocation()
     items = findAllBitcoins() + findAllMonsters()
-    items.sort(key=lambda x: math.sqrt((x0 - x[0])**2 + (y0 - x[1])**2))
-    return items[0]
+    items.sort(key=lambda x: math.sqrt((x0 - x[0]) ** 2 + (y0 - x[1]) ** 2))
+    return items[0] if rd.randrange(200) % 2 else items[rd.randrange(len(items) - 2)]
+
 
 def findRandomMove():
     click(Location(rd.randrange(200), rd.randrange(200)))
@@ -75,9 +80,10 @@ def move():
         click(Location(*findBestMove()))
     else:
         findRandomMove()
-         
+
+
 def main():
-    #startGame()
+    # startGame()
     while True:
         move()
         time.sleep(getDelay())
