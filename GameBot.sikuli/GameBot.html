@@ -1,0 +1,216 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>GameBot.sikuli</h2> <a href="GameBot.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="kw">import</span> math
+<span class="kw">import</span> random
+<span class="kw">import</span> time
+
+<span class="kw">def</span> distance(x1, y1, x2, y2):
+    <span class="kw">return</span> math.sqrt((x1-x2)**<span class="dig">2</span>+(y1-y2)**<span class="dig">2</span>)
+
+BTC = Pattern(<img src="BTC.png" />).similar(<span class="dig">0.55</span>)
+
+DRAGON = Pattern(<img src="DRAGON.png" />).similar(<span class="dig">0.45</span>)
+STATIC = Pattern(<img src="1548265217666.png" />).similar(<span class="dig">0.60</span>)
+
+areaRadius = <span class="dig">200</span>
+fewTaps = [<span class="dig">1</span>,<span class="dig">2</span>]
+
+start = <span class="skw">find</span>(Pattern(<img src="1548262403849.png" />).similar(<span class="dig">0.50</span>))
+LastPos = (start.getX(), start.getY())
+
+DELAY_FACTOR = <span class="dig">450</span>
+
+SCREEN_RES_X = <span class="dig">1080</span>
+SCREEN_RES_Y = <span class="dig">2220</span>
+<span class="kw">def</span> GetMouseCoordinates():
+    getmouseLoc = Env.getMouseLocation()
+    x = getmouseLoc.getX()
+    y = getmouseLoc.getY()
+    <span class="kw">return</span> x, y
+<span class="kw">def</span> GetDelay(x, y):
+    hipotenuse = (math.sqrt(math.pow(x - (SCREEN_RES_X / <span class="dig">2</span>) , <span class="dig">2</span>) + math.pow(y - (SCREEN_RES_Y / <span class="dig">2</span>) , <span class="dig">2</span>)))
+    ReturnDelay = hipotenuse / DELAY_FACTOR
+    <span class="kw">if</span> ( ReturnDelay &lt; <span class="dig">1</span> ):
+        <span class="kw">return</span> <span class="dig">0</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span>(ReturnDelay)
+
+<span class="kw">def</span> maxArea(points, curX, curY):
+    maxAreaObjects = list()
+    centerObject = None
+    minDist = <span class="dig">12345</span>
+
+    <span class="kw">for</span> c <span class="kw">in</span> points:
+        curAreaObjects = []
+        <span class="kw">for</span> p <span class="kw">in</span> points:
+            <span class="kw">if</span> distance(c[<span class="dig">0</span>],c[<span class="dig">1</span>], p[<span class="dig">0</span>],p[<span class="dig">1</span>])&lt;= areaRadius:
+                curAreaObjects.append(p)
+
+        <span class="kw">if</span> len(maxAreaObjects)==len(curAreaObjects):
+            <span class="kw">if</span> distance(curX,curY,c[<span class="dig">0</span>],c[<span class="dig">1</span>])&lt;minDist:
+                maxAreaObjects = curAreaObjects
+                centerObject = c
+                minDist = distance(curX,curY,c[<span class="dig">0</span>],c[<span class="dig">1</span>])
+        <span class="kw">if</span> len(maxAreaObjects)&lt;len(curAreaObjects):
+            maxAreaObjects = curAreaObjects
+            centerObject = c
+            minDist = distance(curX,curY,c[<span class="dig">0</span>],c[<span class="dig">1</span>])
+
+    <span class="kw">print</span>(<span class="str">'OBJECTS:'</span>,str(len(maxAreaObjects)))
+    <span class="kw">print</span>(maxAreaObjects)
+    <span class="kw">print</span>(minDist)
+    <span class="kw">return</span> maxAreaObjects
+
+<span class="kw">def</span> visitArea(objects):
+    objects.sort(key=<span class="kw">lambda</span> x: distance(x[<span class="dig">0</span>],x[<span class="dig">1</span>],LastPos[<span class="dig">0</span>],LastPos[<span class="dig">1</span>]))
+
+    o =  objects[-<span class="dig">1</span>]
+    <span class="kw">if</span> len(objects)&gt;=<span class="dig">3</span>:
+        walkAround(o[<span class="dig">0</span>],o[<span class="dig">1</span>])
+    <span class="kw">else</span>:
+        visitPoint(o[<span class="dig">0</span>],o[<span class="dig">1</span>])
+
+<span class="kw">def</span> walkAround(x,y):
+    <span class="str">''' Walk around area like on romb edges '''</span>
+
+    dx = [random.randint(<span class="dig">2</span>,<span class="dig">4</span>), <span class="dig">0</span>, -random.randint(<span class="dig">2</span>,<span class="dig">4</span>), <span class="dig">0</span>]
+    dy = [<span class="dig">0</span>, random.randint(<span class="dig">2</span>,<span class="dig">4</span>), <span class="dig">0</span>, -random.randint(<span class="dig">2</span>,<span class="dig">4</span>)]
+
+    <span class="kw">for</span> i <span class="kw">in</span> range(len(dx)):
+        nx,ny = x+dx[i], y+dy[i]
+        <span class="skw">click</span>(Location(nx,ny))
+        time.<span class="skw">sleep</span>(random.randint(<span class="dig">200</span>,<span class="dig">400</span>)/<span class="dig">1000</span>)
+
+
+
+
+<span class="kw">def</span> visitPoint(x,y):
+    a = -<span class="dig">4</span>
+    b = <span class="dig">4</span>
+    <span class="kw">for</span> i <span class="kw">in</span> range(random.choice(fewTaps)):
+        xp = x+random.randint(a,b)
+        yp = y+random.randint(a,b)
+        <span class="skw">click</span>(Location(xp,yp))
+        LastPos = (xp, yp)
+        a+=<span class="dig">2</span>
+        b-=<span class="dig">2</span>
+
+    <span class="skw">wait</span>(GetDelay(x,y))
+    LastPos = start.getX(),start.getY()
+
+<span class="kw">def</span> checkObjects():
+    <span class="kw">return</span> exists(BTC) <span class="kw">or</span> exists(DRAGON)
+
+<span class="kw">def</span> walkSomewhere():
+    upClosed = False
+    downClosed = False
+    rightClosed = False
+    leftClosed = False
+
+    <span class="kw">while</span> True:
+        <span class="kw">if</span> exists(Pattern(<img src="1548265566381.png" />).similar(<span class="dig">0.93</span>)): rightClosed = True
+        <span class="kw">if</span> exists(Pattern(<img src="1548270860433.png" />).similar(<span class="dig">0.40</span>)): upClosed
+        <span class="kw">if</span> upClosed <span class="kw">and</span> leftClosed <span class="kw">and</span> rightClosed <span class="kw">and</span> leftClosed:
+            <span class="skw">popup</span>(<span class="str">'Oooops! We are in trouble, boss!'</span>)
+
+        dx = <span class="dig">20</span>
+        dy = <span class="dig">20</span>
+        <span class="kw">if</span> upClosed: dy = -<span class="dig">20</span>
+        <span class="kw">if</span> rightClosed: dx = -<span class="dig">20</span>
+
+        visitPoint(LastPos[<span class="dig">0</span>]+dx, LastPos[<span class="dig">1</span>]+dy)
+
+        <span class="kw">if</span> checkObjects(): <span class="kw">break</span>
+
+<span class="kw">while</span> exists(STATIC):
+
+    points = list()
+    <span class="kw">try</span>:
+        <span class="kw">for</span> p <span class="kw">in</span> findAll(BTC):
+            points.append((p.getX(),p.getY()))
+    <span class="kw">except</span>:
+        <span class="kw">pass</span>
+    <span class="kw">try</span>:
+        <span class="kw">for</span> p <span class="kw">in</span> findAll(DRAGON):
+            points.append((p.getX(),p.getY()))
+    <span class="kw">except</span>:
+        <span class="kw">pass</span>
+
+    <span class="kw">if</span> len(points)!=<span class="dig">0</span>:
+        MA = maxArea(points, LastPos[<span class="dig">0</span>], LastPos[<span class="dig">1</span>])
+        visitArea(MA)
+    <span class="kw">else</span>:
+        walkSomewhere()
+</pre>
+</body>
+</html>
