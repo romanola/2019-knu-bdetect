@@ -1,0 +1,174 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>myBOT.sikuli</h2> <a href="myBOT.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="cmt">#Simple bot for Ejik game with always tries to get longest sequense of collectables by single click</span>
+
+<span class="kw">import</span> random
+<span class="kw">import</span> math
+
+
+locations = [Location(<span class="dig">141</span>, <span class="dig">635</span>),Location(<span class="dig">1176</span>, <span class="dig">89</span>),Location(<span class="dig">158</span>, <span class="dig">132</span>),Location(<span class="dig">1136</span>, <span class="dig">614</span>)]
+walls = []<span class="cmt">#not implemented</span>
+
+
+<span class="kw">class</span> Bot:
+
+    <span class="kw">def</span> __init__(self):
+        self.current_pos = self.find_char()
+
+    <span class="kw">def</span> find_char(self):
+        <span class="str">"""Find nearest to center blue circle as a "Ejik"
+        """</span>
+        center = Location(<span class="dig">619</span>, <span class="dig">367</span>)
+        findAll(Pattern(<span class="str">"warrior.jpg"</span>).similar(<span class="dig">0.29</span>))
+        lst = list(getLastMatches())
+        lst.sort(key=<span class="kw">lambda</span> x:math.hypot(center.getX()-x.getX(), center.getY()-x.getY()))
+        <span class="kw">return</span> lst[<span class="dig">0</span>]
+
+    <span class="kw">def</span> find_collectables(self):
+        <span class="str">"""Locate all collectable items on screen
+        """</span>
+        <span class="cmt">#TODO</span>
+        coins = []
+        dragons = []
+        <span class="kw">try</span>:
+            findAll(Pattern(<img src="1548254350645.png" />).similar(<span class="dig">0.65</span>))
+            coins = list(getLastMatches())
+
+        <span class="kw">except</span>:
+            <span class="kw">pass</span>
+        <span class="kw">try</span>:
+            findAll(Pattern(<img src="1548254317598.png" />).similar(<span class="dig">0.42</span>))
+            dragons = list(getLastMatches())
+        <span class="kw">except</span>:
+            <span class="kw">pass</span>
+        <span class="kw">return</span> coins+dragons
+
+    <span class="kw">def</span> find_wall(self):
+        <span class="cmt">#TODO Not implemented</span>
+        <span class="kw">for</span> wall <span class="kw">in</span> walls:
+            <span class="kw">if</span> exists(wall):
+                t = <span class="skw">find</span>(wall)
+                <span class="skw">click</span>(Location(abs(t.getX())-<span class="dig">500</span>,abs(t.getY())-<span class="dig">500</span>))
+                <span class="kw">break</span>
+
+    <span class="kw">def</span> find_best_way(self):
+        <span class="str">"""Find way with contains the higest number of collectables
+        """</span>
+        max_count = <span class="dig">0</span>
+        max_element = None
+        collectables = self.find_collectables()
+        <span class="kw">for</span> element <span class="kw">in</span> collectables:
+            check_fun = self.current_way(self.current_pos.getX(),self.current_pos.getY(),element.getX(),element.getY())
+            <span class="kw">if</span> <span class="kw">not</span> check_fun:
+                <span class="kw">continue</span>
+            k = <span class="dig">1</span>
+            <span class="kw">for</span> n_element <span class="kw">in</span> collectables:
+                <span class="kw">if</span> check_fun(n_element.getX(),n_element.getY()):
+                    k += <span class="dig">1</span>
+            <span class="kw">if</span> k &gt; max_count:
+                max_count = k
+                max_element = n_element
+        <span class="kw">print</span>(<span class="str">'collected :'</span>,max_count)
+        <span class="kw">return</span> max_element
+
+
+    <span class="kw">def</span> move_to(self):
+        <span class="str">"""Collect or move to a random location
+        """</span>
+        <span class="cmt">#self.find_wall()</span>
+
+        t = self.find_best_way()
+        <span class="kw">if</span> t:
+            <span class="skw">click</span>(t)
+        <span class="kw">else</span>:
+            <span class="skw">click</span>(random.choice(locations))
+
+    <span class="kw">def</span> current_way(self, x_b, y_b, x_e, y_e):
+        <span class="str">"""Limits the area of way from character to collectable item 
+           in order to chek collision with other collectables.
+        """</span>
+        <span class="kw">try</span>:
+            <span class="kw">return</span> <span class="kw">lambda</span> x,y: ((x-x_b)/(x_e-x_b)-(y-y_b)/(y_e-y_b)&lt;<span class="dig">30</span> <span class="kw">and</span>
+                           (x-x_b)/(x_e-x_b)-(y-y_b)/(y_e-y_b)&gt;-<span class="dig">30</span> <span class="kw">and</span>
+                           x&lt;x_e*math.copysign(<span class="dig">1</span>,x_e)+<span class="dig">3</span> <span class="kw">and</span> y&lt;y_e*math.copysign(<span class="dig">1</span>,y_e)+<span class="dig">3</span> <span class="kw">and</span>
+                           x&gt;x_b*math.copysign(<span class="dig">1</span>,x_b) <span class="kw">and</span> y&gt;y_b*math.copysign(<span class="dig">1</span>,y_b))
+        <span class="kw">except</span> ZeroDivisionError:
+            <span class="kw">return</span> None
+t = Bot()
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="dig">100</span>):
+    <span class="kw">print</span>(<span class="str">"step "</span>,i)
+    t.move_to()
+    <span class="skw">wait</span>(random.randrange(<span class="dig">2</span>,<span class="dig">10</span>))
+</pre>
+</body>
+</html>
