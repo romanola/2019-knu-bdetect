@@ -1,0 +1,278 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>CheatBot.sikuli</h2> <a href="CheatBot.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="kw">import</span> random
+<span class="kw">import</span> math
+
+EJIK_NOT_FOUND = <span class="str">"Ejik not found. Are you running the game?"</span>
+
+AHEAD = <span class="str">"N"</span>
+AHEAD_STARBOARD = <span class="str">"NE"</span>
+STARBOARD = <span class="str">"E"</span>
+AFT_STARBOARD = <span class="str">"SE"</span>
+AFT = <span class="str">"S"</span>
+AFT_PORT = <span class="str">"SW"</span>
+PORT = <span class="str">"W"</span>
+AHEAD_PORT = <span class="str">"NW"</span>
+
+DELAY_FACTOR = <span class="dig">450</span>
+
+SCREEN_RES_X = <span class="dig">1080</span>
+SCREEN_RES_Y = <span class="dig">2220</span>
+
+<span class="kw">def</span> StartNewGame():
+    <span class="skw">wait</span>(Pattern(<img src="1548085274534.png" />).exact(), <span class="dig">120</span>)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085274534.png" />).exact()):
+        <span class="skw">click</span>(Pattern(<img src="1548085274534.png" />).exact())
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(<span class="str">"Can't start new game. Are you on main title screen?"</span>)
+
+<span class="kw">def</span> DoNothing():
+    <span class="kw">print</span>(<span class="str">"!!!!!"</span>)
+
+<span class="kw">def</span> GetMouseCoordinates():
+    getmouseLoc = Env.getMouseLocation()
+    x = getmouseLoc.getX()
+    y = getmouseLoc.getY()
+    <span class="kw">return</span> x, y
+
+<span class="kw">def</span> GetDelay(x, y):
+    hipotenuse = (math.sqrt(math.pow(x - (SCREEN_RES_X / <span class="dig">2</span>) , <span class="dig">2</span>) + math.pow(y - (SCREEN_RES_Y / <span class="dig">2</span>) , <span class="dig">2</span>)))
+    ReturnDelay = hipotenuse / DELAY_FACTOR
+    <span class="kw">if</span> ( ReturnDelay &lt; <span class="dig">1</span> ):
+        <span class="kw">return</span> <span class="dig">0</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span>(ReturnDelay)
+
+<span class="kw">def</span> EatApple(delay):
+        <span class="kw">try</span>:
+            <span class="skw">click</span>(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.85</span>))
+
+        <span class="kw">except</span>:
+            EatMushroom(delay)
+            <span class="kw">return</span>
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+
+
+<span class="kw">def</span> EatMushroom(delay):
+        <span class="kw">try</span>:
+            <span class="skw">click</span>(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.85</span>))
+        <span class="kw">except</span>:
+            EatApple(delay)
+            <span class="kw">return</span>
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+
+
+
+
+<span class="kw">def</span> RunN(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunNE(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunE(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunSE(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">364</span>,<span class="dig">666</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunS(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">846</span>,<span class="dig">657</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunSW(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">1494</span>,<span class="dig">635</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunW(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">1512</span>,<span class="dig">355</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> RunNW(delay):
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">1427</span>,<span class="dig">52</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.60</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+        x, y = GetMouseCoordinates()
+        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">else</span>:
+        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+
+<span class="kw">def</span> Run(direction, delay):
+    <span class="kw">if</span> direction == AHEAD:
+        RunN(delay)
+
+    <span class="kw">elif</span> direction == AHEAD_STARBOARD:
+        RunNW(delay)
+
+    <span class="kw">elif</span> direction == STARBOARD:
+        RunE(delay)
+
+    <span class="kw">elif</span> direction == AFT_STARBOARD:
+        RunSE(delay)
+
+    <span class="kw">elif</span> direction == AFT:
+        RunS(delay)
+
+    <span class="kw">elif</span> direction == AFT_PORT:
+        RunSW(delay)
+
+    <span class="kw">elif</span> direction == PORT:
+        RunW(delay)
+
+    <span class="kw">elif</span> direction == AHEAD_PORT:
+        RunNW(delay)
+    <span class="kw">else</span>:
+        RunSW(delay)
+
+<span class="kw">def</span> RandomRun(delay):
+    Direction = [AHEAD, AHEAD_STARBOARD, AFT_STARBOARD, AFT, AFT_PORT, PORT, AHEAD_PORT]
+    Run(random.choice(Direction), delay)
+
+<span class="cmt">#StartNewGame()</span>
+
+<span class="kw">while</span>(<span class="dig">1</span>):
+
+    Action = [<span class="str">'apple'</span> , <span class="str">'mushroom'</span>]
+    res = random.choice(Action)
+    <span class="kw">print</span> (res + <span class="str">" rolled"</span>)
+    <span class="kw">if</span> res == <span class="str">'apple'</span>:
+        go = exists(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
+        <span class="kw">if</span> go !=  None:
+            <span class="kw">print</span> (<span class="str">"Found apple, clicking"</span>)
+            EatApple(<span class="dig">1</span>)
+        <span class="kw">else</span>:
+             go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
+             <span class="kw">if</span> go !=  None:
+                 <span class="kw">print</span> (<span class="str">"Found mushroom, clicking"</span>)
+                 EatMushroom(<span class="dig">1</span>)
+             <span class="kw">else</span>:
+                 <span class="kw">print</span> (<span class="str">"Nothing found, running"</span>)
+                 RandomRun(<span class="dig">1</span>)
+
+    <span class="kw">else</span>:
+        go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
+        <span class="kw">if</span> go !=  None:
+            <span class="kw">print</span> (<span class="str">"Found mushroom, clicking"</span>)
+            EatMushroom(<span class="dig">1</span>)
+        <span class="kw">else</span>:
+             go = exists(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
+             <span class="kw">if</span> go !=  None:
+                 <span class="kw">print</span> (<span class="str">"Found apple, clicking"</span>)
+                 EatApple(<span class="dig">1</span>)
+             <span class="kw">else</span>:
+                 <span class="kw">print</span> (<span class="str">"Nothing found, running"</span>)
+                 RandomRun(<span class="dig">1</span>)
+</pre>
+</body>
+</html>
