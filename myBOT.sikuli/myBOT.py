@@ -1,4 +1,4 @@
-#Simple bot for Ejik game with always tries to get longest sequense of collectables by single click
+#Simple bot for Ejik game which always tries to get longest sequense of collectables by single click
 
 import random
 import math
