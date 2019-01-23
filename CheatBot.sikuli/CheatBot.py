@@ -18,9 +18,9 @@ SCREEN_RES_X = 1080
 SCREEN_RES_Y = 2220 
 
 def StartNewGame():
-    wait(Pattern("1548085274534.png").exact(), 120)
-    if exists(Pattern("1548085274534.png").exact()):
-        click(Pattern("1548085274534.png").exact())
+    wait("newGame.png", 120)
+    if exists("newGame-1.png"):
+        click("newGame-2.png")
     else:
         popup("Can't start new game. Are you on main title screen?")
     
@@ -43,7 +43,7 @@ def GetDelay(x, y):
 
 def EatApple(delay):
         try:
-            click(Pattern("1544532767518.png").similar(0.75))
+            click(Pattern("bitcoin.png").similar(0.30))
         except:
             EatMushroom(delay)
             return
@@ -53,7 +53,7 @@ def EatApple(delay):
 
 def EatMushroom(delay):
         try:
-            click(Pattern("1544532811888.png").similar(0.32))
+            click(Pattern("monstr.png").similar(0.14))
         except: 
             EatApple(delay)
             return
@@ -174,12 +174,12 @@ while(1):
     res = random.choice(Action)
     print (res + "rolled")
     if res == 'apple':
-        go = exists(Pattern("1544532767518.png").similar(0.85), 1)
+        go = exists(Pattern("bitcoin-1.png").similar(0.33), 1)
         if go !=  None:
             print ("Found apple, clicking")
             EatApple(1)
         else:
-             go = exists(Pattern("1544532811888.png").similar(0.60), 1)  
+             go = exists(Pattern("monstr-1.png").similar(0.17), 1)  
              if go !=  None:
                  print ("Found mushroom, clicking")
                  EatMushroom(1)
@@ -188,12 +188,12 @@ while(1):
                  RandomRun(1)
             
     else:
-        go = exists(Pattern("1544532811888.png").similar(0.60), 1)
+        go = exists(Pattern("monstr-2.png").similar(0.17), 1)
         if go !=  None:
             print ("Found mushroom, clicking")
             EatMushroom(1)
         else:
-             go = exists(Pattern("1544532767518.png").similar(0.85), 1)  
+             go = exists(Pattern("bitcoin-2.png").similar(0.31), 1)  
              if go !=  None:
                  print ("Found apple, clicking")
                  EatApple(1)
