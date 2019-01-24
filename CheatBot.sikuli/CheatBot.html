@@ -84,10 +84,13 @@ AFT_PORT = <span class="str">"SW"</span>
 PORT = <span class="str">"W"</span>
 AHEAD_PORT = <span class="str">"NW"</span>
 
-DELAY_FACTOR = <span class="dig">450</span>
+DELAY_FACTOR = <span class="dig">400</span>
 
-SCREEN_RES_X = <span class="dig">1080</span>
-SCREEN_RES_Y = <span class="dig">2220</span>
+scr = Screen.getBounds(<span class="dig">0</span>)
+<span class="cmt"># SCREEN_RES_X = 1080</span>
+<span class="cmt"># SCREEN_RES_Y = 2220 </span>
+SCREEN_RES_X = scr.height
+SCREEN_RES_Y = scr.width
 
 <span class="kw">def</span> StartNewGame():
     <span class="skw">wait</span>(Pattern(<img src="1548085274534.png" />).exact(), <span class="dig">120</span>)
@@ -106,16 +109,16 @@ SCREEN_RES_Y = <span class="dig">2220</span>
     <span class="kw">return</span> x, y
 
 <span class="kw">def</span> GetDelay(x, y):
-    hipotenuse = (math.sqrt(math.pow(x - (SCREEN_RES_X / <span class="dig">2</span>) , <span class="dig">2</span>) + math.pow(y - (SCREEN_RES_Y / <span class="dig">2</span>) , <span class="dig">2</span>)))
+    hipotenuse = math.sqrt(math.pow(x - (SCREEN_RES_X / <span class="dig">2</span>) , <span class="dig">2</span>) + math.pow(y - (SCREEN_RES_Y / <span class="dig">2</span>) , <span class="dig">2</span>))
     ReturnDelay = hipotenuse / DELAY_FACTOR
-    <span class="kw">if</span> ( ReturnDelay &lt; <span class="dig">1</span> ):
+    <span class="kw">if</span> ReturnDelay &lt; <span class="dig">0</span>:
         <span class="kw">return</span> <span class="dig">0</span>
     <span class="kw">else</span>:
         <span class="kw">return</span>(ReturnDelay)
 
 <span class="kw">def</span> EatApple(delay):
         <span class="kw">try</span>:
-            <span class="skw">click</span>(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.85</span>))
+            <span class="skw">click</span>(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.75</span>))
 
         <span class="kw">except</span>:
             EatMushroom(delay)
@@ -126,7 +129,7 @@ SCREEN_RES_Y = <span class="dig">2220</span>
 
 <span class="kw">def</span> EatMushroom(delay):
         <span class="kw">try</span>:
-            <span class="skw">click</span>(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.85</span>))
+            <span class="skw">click</span>(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.50</span>))
         <span class="kw">except</span>:
             EatApple(delay)
             <span class="kw">return</span>
@@ -137,72 +140,72 @@ SCREEN_RES_Y = <span class="dig">2220</span>
 
 
 <span class="kw">def</span> RunN(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunNE(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunE(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunSE(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">364</span>,<span class="dig">666</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">364</span>,<span class="dig">666</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunS(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">846</span>,<span class="dig">657</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">846</span>,<span class="dig">657</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunSW(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">1494</span>,<span class="dig">635</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">1494</span>,<span class="dig">635</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunW(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">1512</span>,<span class="dig">355</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">1512</span>,<span class="dig">355</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
         <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
 <span class="kw">def</span> RunNW(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">1427</span>,<span class="dig">52</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.80</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.60</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
+    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">1427</span>,<span class="dig">52</span>), delay)
+    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
+        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
         x, y = GetMouseCoordinates()
         <span class="skw">wait</span>(GetDelay(x, y))
     <span class="kw">else</span>:
@@ -236,8 +239,20 @@ SCREEN_RES_Y = <span class="dig">2220</span>
         RunSW(delay)
 
 <span class="kw">def</span> RandomRun(delay):
-    Direction = [AHEAD, AHEAD_STARBOARD, AFT_STARBOARD, AFT, AFT_PORT, PORT, AHEAD_PORT]
-    Run(random.choice(Direction), delay)
+   Direction = [AHEAD, AHEAD_STARBOARD, AFT_STARBOARD, AFT, AFT_PORT, PORT, AHEAD_PORT]
+   Run(random.choice(Direction), delay)
+
+<span class="kw">def</span> RandomRun_new:
+    <span class="str">"""
+       TODO finish this
+    """</span>
+    center_x = SCREEN_RES_X // <span class="dig">2</span>
+    center_y = SCREEN_RES_Y // <span class="dig">2</span>
+    diag = math.sqrt(math.pow(center_x , <span class="dig">2</span>) + math.pow(center_y, <span class="dig">2</span>))
+    radius = diag // <span class="dig">5</span>
+    radius += (random.random() - <span class="dig">0.5</span>) * (radius // <span class="dig">2</span>)
+    degree = random.choice(list(range(<span class="dig">360</span>)))
+
 
 <span class="cmt">#StartNewGame()</span>
 
@@ -252,7 +267,7 @@ SCREEN_RES_Y = <span class="dig">2220</span>
             <span class="kw">print</span> (<span class="str">"Found apple, clicking"</span>)
             EatApple(<span class="dig">1</span>)
         <span class="kw">else</span>:
-             go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
+             go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.50</span>), <span class="dig">1</span>)
              <span class="kw">if</span> go !=  None:
                  <span class="kw">print</span> (<span class="str">"Found mushroom, clicking"</span>)
                  EatMushroom(<span class="dig">1</span>)
@@ -261,7 +276,7 @@ SCREEN_RES_Y = <span class="dig">2220</span>
                  RandomRun(<span class="dig">1</span>)
 
     <span class="kw">else</span>:
-        go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
+        go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.50</span>), <span class="dig">1</span>)
         <span class="kw">if</span> go !=  None:
             <span class="kw">print</span> (<span class="str">"Found mushroom, clicking"</span>)
             EatMushroom(<span class="dig">1</span>)
