@@ -3,96 +3,114 @@ import math
 import time
 
 
-def startGame():
-    if exists(Pattern("newGame-1.png").similar(0.38)):
-        click("newGame-2.png")
-    else:
-        popup("Can't start new game. Are you on main title screen?")
+def distance(d1: tuple, d2: tuple):
+    """
+    finding the distance between two points
+    :param d1: first dot
+    :param d2: second dot
+    :return: distance
+    """
+    x1, y1 = d1
+    x2, y2 = d2
+    return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 
-def getDelay():
-    delay = 0
-    tmp = rd.randrange(20)
-    if not tmp % 6:
-        delay = rd.randrange(2, 5)
-    else:
-        delay = rd.randrange(2)
-    return delay
+def getRegionShape():
+    """
+    selects the bot action Region
+    """
+    r = Region("""get your image here""")
+    return r.x, r.y, r.w, r.h, r
 
 
-def getMouseCoordinates():
-    mouse = Env.getMouseLocation()
-    return mouse.getX(), mouse.getY()
+class Window:
+    """ class implementing the window (emulator) """
+    def __init__(self, dot: tuple, h: int, w: int):
+        """
+        constructor
+        :param dot: top left window
+        :param h: window height
+        :param w: window width
+        """
+        self.dot = dot
+        self.h = h
+        self.w = w
+        self.center = (dot[0] + int(w/2), dot[1] + int(h/2))
+
+        # angle between window diagonal and x axis
+        self.angle = math.atan((self.dot[0] + self.w) / (self.dot[1] + self.h))
+
+    def shape(self):
+        """
+        :return: the four point tuple (defining window)
+        """
+        return self.dot, (self.dot[0] + self.w, self.dot[1]), (self.dot[0] + self.w, self.dot[1] + self.h),\
+               (self.dot[0], self.dot[1] + self.h)
 
 
-def getHeroLocation():
-    x = 793
-    y = 364
-    return x, y
+class Runner:
+    """ character class """
+    def __init__(self, window: Window):
+        """
+        constructor
+        :param window: emulator window
+        """
+        self.start = (0, 0)
+        self.current = (0, 0)
+        self.window = window
 
+    def go(self, location: tuple):
+        """
+        character move
+        :param location: destination coordinates
+        :return: None
+        """
+        x, y = location  # in absolute display coordinates
+        # in emulator window coordinates
+        tmp_x = x - self.window.dot[0]
+        tmp_y = y - self.window.dot[1]
 
-def getRegion():
-    a = (144, 339)
-    b = (144, 46)
-    c = (753, 46)
-    d = (753, 339)
-    return a, b, c, d
+        # in character coordinates
+        new_x = tmp_x - self.window.center[0]
+        new_y = tmp_y - self.window.center[1]
 
+        self.current = (new_x, new_y)
+        click(Location(*location))
 
-def getRandomAngle():
-    angle = rd.randrange(10000)
-    return angle % 360
+    def _get_random_angle(self, deviation=5):
+        """
+        :param deviation: deviation
+        :return: random angle
+        """
+        ...
 
+    def _get_random_length(self):
+        """
+        :return: random length
+        """
+        diagonal = math.sqrt((self.window.dot[0] + self.window.w)**2 + (self.window.dot[1] + self.window.h)**2)
+        max_len = int(diagonal / 2)
+        return rd.randrange(5, max_len - 10)
 
-def findAllBitcoins():
-    bitcoins = findAll(Pattern("bitcoin-1.png").similar(0.38))
-    bitList = []
-    for i in bitcoins:
-        bitList.append((i.getX(), i.getY()))
-    return bitList
+    def anotherWay(self):
+        """
+        alternate move
+        used when there are no items or character in a dead end
+        :return: None
+        """
+        z = Runner._get_random_length()  # diagonal
+        len_x = z * math.cos(self.window.angle)
+        len_y = z * math.sin(self.window.angle)
+        new_x = abs(self.current[0] - len_x)
+        new_y = abs(self.current[1] - len_y)
 
+        # in emulator window
+        x_for_click = new_x - self.window.center[0]
+        y_for_click = new_y - self.window.center[1]
 
-def findAllMonsters():
-    monsters = findAll(Pattern("monster.png").similar(0.20))
-    monsterList = []
-    for i in monsters:
-        monsterList.append((i.getX(), i.getY()))
-    return monsterList
+        # in absolute coordinates
+        x_for_click -= self.window.dot[0]
+        y_for_click -= self.window.dot[1]
 
+        self.go((x_for_click, y_for_click))
 
-def check():
-    return findAllBitcoins() != [] or findAllMonsters() != []
-
-
-def findBestMove():
-    x0, y0 = getHeroLocation()
-    items = findAllBitcoins() + findAllMonsters()
-    items.sort(key=lambda x: math.sqrt((x0 - x[0]) ** 2 + (y0 - x[1]) ** 2))
-    return items[0] if rd.randrange(200) % 2 else items[rd.randrange(len(items) - 2)]
-
-
-def findRandomMove():
-    click(Location(rd.randrange(200), rd.randrange(200)))
-
-
-def move():
-    if check():
-        click(Location(*findBestMove()))
-    else:
-        findRandomMove()
-
-
-def main():
-    # startGame()
-    while True:
-        move()
-        time.sleep(getDelay())
-
-
-def test():
-    icons = findAll(Pattern("bitcoin.png").similar(0.33))
-    return icons
-
-
-if __name__ == '__main__':
-    main()
