@@ -67,227 +67,303 @@
    </head>
 <body>
 <div class="info">
-<h2>CheatBot.sikuli</h2> <a href="CheatBot.zip">(Download this script)</a>
+<h2>GameBot.sikuli</h2> <a href="GameBot.zip">(Download this script)</a>
 </div>
 <pre class="sikuli-code">
-<span class="kw">import</span> random
 <span class="kw">import</span> math
+<span class="kw">import</span> random
+<span class="kw">import</span> time
 
-EJIK_NOT_FOUND = <span class="str">"Ejik not found. Are you running the game?"</span>
+<span class="kw">class</span> Window:
+    <span class="str">""" class implementing the window (emulator) """</span>
 
-AHEAD = <span class="str">"N"</span>
-AHEAD_STARBOARD = <span class="str">"NE"</span>
-STARBOARD = <span class="str">"E"</span>
-AFT_STARBOARD = <span class="str">"SE"</span>
-AFT = <span class="str">"S"</span>
-AFT_PORT = <span class="str">"SW"</span>
-PORT = <span class="str">"W"</span>
-AHEAD_PORT = <span class="str">"NW"</span>
+    <span class="kw">def</span> __init__(self):
+        <span class="str">"""
+        constructor
+        :param dot: top left window
+        :param h: window height
+        :param w: window width
+        """</span>
 
-DELAY_FACTOR = <span class="dig">400</span>
+        <span class="cmt">#r = Region("""get your image here""")</span>
+        r = Region(Region(<span class="dig">6</span>,<span class="dig">33</span>,<span class="dig">1264</span>,<span class="dig">615</span>))
 
-scr = Screen.getBounds(<span class="dig">0</span>)
-<span class="cmt"># SCREEN_RES_X = 1080</span>
-<span class="cmt"># SCREEN_RES_Y = 2220 </span>
-SCREEN_RES_X = scr.height
-SCREEN_RES_Y = scr.width
+        self.dot = (r.x, r.y)
+        self.h = r.w
+        self.w = r.h
+        self.center = (self.dot[<span class="dig">0</span>] + int(r.w/<span class="dig">2</span>), self.dot[<span class="dig">1</span>] + int(r.h/<span class="dig">2</span>))
 
-<span class="kw">def</span> StartNewGame():
-    <span class="skw">wait</span>(Pattern(<img src="1548085274534.png" />).exact(), <span class="dig">120</span>)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085274534.png" />).exact()):
-        <span class="skw">click</span>(Pattern(<img src="1548085274534.png" />).exact())
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(<span class="str">"Can't start new game. Are you on main title screen?"</span>)
+        <span class="cmt"># angle between window diagonal and x axis</span>
+        self.angle = math.atan((self.dot[<span class="dig">0</span>] + self.w) / (self.dot[<span class="dig">1</span>] + self.h))
 
-<span class="kw">def</span> DoNothing():
-    <span class="kw">print</span>(<span class="str">"!!!!!"</span>)
+    <span class="kw">def</span> shape(self):
+        <span class="str">"""
+        :return: the four point tuple (defining window)
+        """</span>
+        <span class="kw">return</span> self.dot, (self.dot[<span class="dig">0</span>] + self.w, self.dot[<span class="dig">1</span>]), (self.dot[<span class="dig">0</span>] + self.w, self.dot[<span class="dig">1</span>] + self.h),\
+               (self.dot[<span class="dig">0</span>], self.dot[<span class="dig">1</span>] + self.h)
 
+
+<span class="kw">class</span> Runner:
+    <span class="str">""" character class """</span>
+    <span class="kw">def</span> __init__(self, window):
+        <span class="str">"""
+        constructor
+        :param window: emulator window
+        """</span>
+        self.start = (<span class="dig">0</span>, <span class="dig">0</span>)
+        self.current = (<span class="dig">0</span>, <span class="dig">0</span>)
+        self.window = window
+
+    <span class="kw">def</span> go(self, location, needGo = False):
+        <span class="str">"""
+        character move
+        :param location: destination coordinates
+        :return: None
+        """</span>
+        x, y = location  <span class="cmt"># in absolute display coordinates</span>
+        <span class="cmt"># in emulator window coordinates</span>
+        tmp_x = x - self.window.dot[<span class="dig">0</span>]
+        tmp_y = y - self.window.dot[<span class="dig">1</span>]
+
+        <span class="cmt"># in character coordinates</span>
+        new_x = tmp_x - self.window.center[<span class="dig">0</span>]
+        new_y = tmp_y - self.window.center[<span class="dig">1</span>]
+
+        self.current = (new_x, new_y)
+
+        <span class="kw">if</span> needGo:
+            <span class="skw">click</span>(Location(*location))
+
+    <span class="kw">def</span> _get_random_angle(self, deviation=<span class="dig">5</span>):
+        <span class="str">"""
+        :param deviation: deviation
+        :return: random angle
+        """</span>
+        <span class="kw">pass</span>
+
+    <span class="kw">def</span> _get_random_length(self):
+        <span class="str">"""
+        :return: random length
+        """</span>
+        diagonal = math.sqrt((self.window.dot[<span class="dig">0</span>] + self.window.w)**<span class="dig">2</span> + (self.window.dot[<span class="dig">1</span>] + self.window.h)**<span class="dig">2</span>)
+        max_len = int(diagonal / <span class="dig">2</span>)
+        <span class="kw">return</span> rd.randrange(<span class="dig">5</span>, max_len - <span class="dig">10</span>)
+
+    <span class="kw">def</span> anotherWay(self):
+        <span class="str">"""
+        alternate move
+        used when there are no items or character in a dead end
+        :return: None
+        """</span>
+        z = Runner._get_random_length(self)  <span class="cmt"># diagonal</span>
+        len_x = z * math.cos(self.window.angle)
+        len_y = z * math.sin(self.window.angle)
+        new_x = abs(self.current[<span class="dig">0</span>] - len_x)
+        new_y = abs(self.current[<span class="dig">1</span>] - len_y)
+
+        <span class="cmt"># in emulator window</span>
+        x_for_click = new_x - self.window.center[<span class="dig">0</span>]
+        y_for_click = new_y - self.window.center[<span class="dig">1</span>]
+
+        <span class="cmt"># in absolute coordinates</span>
+        x_for_click -= self.window.dot[<span class="dig">0</span>]
+        y_for_click -= self.window.dot[<span class="dig">1</span>]
+
+        y_for_click = int(y_for_click)+start.getY()
+        x_for_click = int(x_for_click)+start.getX()
+
+        <span class="kw">print</span>(x_for_click,y_for_click)
+
+        self.go((x_for_click, y_for_click), True)
+
+
+<span class="kw">def</span> distance(x1, y1, x2, y2):
+    <span class="kw">return</span> math.sqrt((x1-x2)**<span class="dig">2</span>+(y1-y2)**<span class="dig">2</span>)
+
+BTC = Pattern(<img src="BTC.png" />).similar(<span class="dig">0.55</span>)
+
+DRAGON = Pattern(<img src="DRAGON.png" />).similar(<span class="dig">0.45</span>)
+STATIC = Pattern(<img src="1548265217666.png" />).similar(<span class="dig">0.60</span>)
+
+runner = Runner(Window())
+
+areaRadius = <span class="dig">200</span>
+fewTaps = [<span class="dig">1</span>,<span class="dig">2</span>,<span class="dig">3</span>,<span class="dig">4</span>]
+
+start = <span class="skw">find</span>(Pattern(<img src="1548262403849.png" />).similar(<span class="dig">0.50</span>))
+LastPos = (start.getX(), start.getY())
+
+DELAY_FACTOR = <span class="dig">450</span>
+
+SCREEN_RES_X = <span class="dig">1080</span>
+SCREEN_RES_Y = <span class="dig">2220</span>
 <span class="kw">def</span> GetMouseCoordinates():
     getmouseLoc = Env.getMouseLocation()
     x = getmouseLoc.getX()
     y = getmouseLoc.getY()
     <span class="kw">return</span> x, y
-
 <span class="kw">def</span> GetDelay(x, y):
-    hipotenuse = math.sqrt(math.pow(x - (SCREEN_RES_X / <span class="dig">2</span>) , <span class="dig">2</span>) + math.pow(y - (SCREEN_RES_Y / <span class="dig">2</span>) , <span class="dig">2</span>))
+    hipotenuse = (math.sqrt(math.pow(x - (SCREEN_RES_X / <span class="dig">2</span>) , <span class="dig">2</span>) + math.pow(y - (SCREEN_RES_Y / <span class="dig">2</span>) , <span class="dig">2</span>)))
     ReturnDelay = hipotenuse / DELAY_FACTOR
-    <span class="kw">if</span> ReturnDelay &lt; <span class="dig">0</span>:
+    <span class="kw">if</span> ( ReturnDelay &lt; <span class="dig">1</span> ):
         <span class="kw">return</span> <span class="dig">0</span>
     <span class="kw">else</span>:
         <span class="kw">return</span>(ReturnDelay)
 
-<span class="kw">def</span> EatApple(delay):
-        <span class="kw">try</span>:
-            <span class="skw">click</span>(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.75</span>))
+<span class="kw">def</span> maxArea(points, curX, curY):
+    maxAreaObjects = list()
+    centerObject = None
+    minDist = <span class="dig">12345</span>
 
-        <span class="kw">except</span>:
-            EatMushroom(delay)
-            <span class="kw">return</span>
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">for</span> c <span class="kw">in</span> points:
+        curAreaObjects = []
+        <span class="kw">for</span> p <span class="kw">in</span> points:
+            <span class="kw">if</span> distance(c[<span class="dig">0</span>],c[<span class="dig">1</span>], p[<span class="dig">0</span>],p[<span class="dig">1</span>])&lt;= areaRadius:
+                curAreaObjects.append(p)
 
+        <span class="kw">if</span> len(maxAreaObjects)==len(curAreaObjects):
+            <span class="kw">if</span> distance(curX,curY,c[<span class="dig">0</span>],c[<span class="dig">1</span>])&lt;minDist:
+                maxAreaObjects = curAreaObjects
+                centerObject = c
+                minDist = distance(curX,curY,c[<span class="dig">0</span>],c[<span class="dig">1</span>])
+        <span class="kw">if</span> len(maxAreaObjects)&lt;len(curAreaObjects):
+            maxAreaObjects = curAreaObjects
+            centerObject = c
+            minDist = distance(curX,curY,c[<span class="dig">0</span>],c[<span class="dig">1</span>])
 
-<span class="kw">def</span> EatMushroom(delay):
-        <span class="kw">try</span>:
-            <span class="skw">click</span>(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.50</span>))
-        <span class="kw">except</span>:
-            EatApple(delay)
-            <span class="kw">return</span>
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
+    <span class="kw">print</span>(<span class="str">'OBJECTS:'</span>,str(len(maxAreaObjects)))
+    <span class="kw">print</span>(maxAreaObjects)
+    <span class="kw">print</span>(minDist)
+    <span class="kw">return</span> maxAreaObjects, list(set(points)-set(maxAreaObjects))
 
+<span class="kw">def</span> visitArea(objects):
+    objects.sort(key=<span class="kw">lambda</span> x: distance(x[<span class="dig">0</span>],x[<span class="dig">1</span>],LastPos[<span class="dig">0</span>],LastPos[<span class="dig">1</span>]))
 
-
-
-<span class="kw">def</span> RunN(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">834</span>,<span class="dig">33</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
+    o =  objects[-<span class="dig">1</span>]
+    <span class="kw">if</span> len(objects)&gt;=<span class="dig">3</span>:
+        walkAround(o[<span class="dig">0</span>],o[<span class="dig">1</span>])
     <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
+        visitPoint(o[<span class="dig">0</span>],o[<span class="dig">1</span>])
 
-<span class="kw">def</span> RunNE(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">201</span>,<span class="dig">60</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
 
-<span class="kw">def</span> RunE(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
-
-<span class="kw">def</span> RunSE(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">364</span>,<span class="dig">666</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
-
-<span class="kw">def</span> RunS(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">846</span>,<span class="dig">657</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
-
-<span class="kw">def</span> RunSW(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">1494</span>,<span class="dig">635</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
-
-<span class="kw">def</span> RunW(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">1512</span>,<span class="dig">355</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
-
-<span class="kw">def</span> RunNW(delay):
-    <span class="skw">wait</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">1427</span>,<span class="dig">52</span>), delay)
-    <span class="kw">if</span> exists(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>)):
-        <span class="skw">click</span>(Pattern(<img src="1548085434717.png" />).similar(<span class="dig">0.55</span>).targetOffset(-<span class="dig">205</span>,<span class="dig">339</span>))
-        x, y = GetMouseCoordinates()
-        <span class="skw">wait</span>(GetDelay(x, y))
-    <span class="kw">else</span>:
-        <span class="skw">popup</span>(EJIK_NOT_FOUND)
-
-<span class="kw">def</span> Run(direction, delay):
-    <span class="kw">if</span> direction == AHEAD:
-        RunN(delay)
-
-    <span class="kw">elif</span> direction == AHEAD_STARBOARD:
-        RunNW(delay)
-
-    <span class="kw">elif</span> direction == STARBOARD:
-        RunE(delay)
-
-    <span class="kw">elif</span> direction == AFT_STARBOARD:
-        RunSE(delay)
-
-    <span class="kw">elif</span> direction == AFT:
-        RunS(delay)
-
-    <span class="kw">elif</span> direction == AFT_PORT:
-        RunSW(delay)
-
-    <span class="kw">elif</span> direction == PORT:
-        RunW(delay)
-
-    <span class="kw">elif</span> direction == AHEAD_PORT:
-        RunNW(delay)
-    <span class="kw">else</span>:
-        RunSW(delay)
-
-<span class="kw">def</span> RandomRun(delay):
-   Direction = [AHEAD, AHEAD_STARBOARD, AFT_STARBOARD, AFT, AFT_PORT, PORT, AHEAD_PORT]
-   Run(random.choice(Direction), delay)
-
-<span class="kw">def</span> RandomRun_new:
-    <span class="str">"""
-       TODO finish this
+<span class="kw">def</span> current_way(x_b, y_b, x_e, y_e):
+    <span class="str">"""Limits the area of way from character to collectable item
+       in order to chek collision with other collectables.
     """</span>
-    center_x = SCREEN_RES_X // <span class="dig">2</span>
-    center_y = SCREEN_RES_Y // <span class="dig">2</span>
-    diag = math.sqrt(math.pow(center_x , <span class="dig">2</span>) + math.pow(center_y, <span class="dig">2</span>))
-    radius = diag // <span class="dig">5</span>
-    radius += (random.random() - <span class="dig">0.5</span>) * (radius // <span class="dig">2</span>)
-    degree = random.choice(list(range(<span class="dig">360</span>)))
+    <span class="kw">def</span> f(x,y):
+        <span class="kw">try</span>:
+            coef = <span class="dig">15</span>
+            <span class="kw">return</span> ((x-x_b)/(x_e-x_b)-(y-y_b)/(y_e-y_b)&lt;<span class="dig">15</span> <span class="kw">and</span>
+                       (x-x_b)/(x_e-x_b)-(y-y_b)/(y_e-y_b)&gt;-<span class="dig">15</span> <span class="kw">and</span>
+                       x&lt;x_e*math.copysign(<span class="dig">1</span>,x_e)+<span class="dig">3</span> <span class="kw">and</span> y&lt;y_e*math.copysign(<span class="dig">1</span>,y_e)+<span class="dig">3</span> <span class="kw">and</span>
+                       x&gt;x_b*math.copysign(<span class="dig">1</span>,x_b) <span class="kw">and</span> y&gt;y_b*math.copysign(<span class="dig">1</span>,y_b))
+        <span class="kw">except</span> ZeroDivisionError:
+            <span class="kw">return</span> None
+    <span class="kw">return</span> f
 
+<span class="kw">def</span> find_best_way(collisions, cluster, start):
+    <span class="str">"""Find way with contains the higest number of collectables
+    """</span>
+    max_count = <span class="dig">0</span>
+    max_element = None
+    <span class="kw">for</span> element <span class="kw">in</span> cluster:
+        check_fun = current_way(start.getX(),start.getY(),element[<span class="dig">0</span>],element[<span class="dig">1</span>])
+        <span class="kw">if</span> <span class="kw">not</span> check_fun:
+            <span class="kw">continue</span>
+        k = <span class="dig">1</span>
+        <span class="kw">for</span> n_element <span class="kw">in</span> collisions:
+            <span class="kw">if</span> check_fun(n_element[<span class="dig">0</span>],n_element[<span class="dig">1</span>]):
+                k += <span class="dig">1</span>
+        <span class="kw">if</span> k &gt; max_count:
+            max_count = k
+            max_element = n_element
+    <span class="kw">print</span>(<span class="str">'collected :'</span>,max_count)
+    <span class="kw">return</span> max_element
 
-<span class="cmt">#StartNewGame()</span>
+<span class="kw">def</span> walkAround(x,y):
+    <span class="str">''' Walk around area like on romb edges '''</span>
 
-<span class="kw">while</span>(<span class="dig">1</span>):
+    dx = [random.randint(<span class="dig">2</span>,<span class="dig">4</span>), <span class="dig">0</span>, -random.randint(<span class="dig">2</span>,<span class="dig">4</span>), <span class="dig">0</span>]
+    dy = [<span class="dig">0</span>, random.randint(<span class="dig">2</span>,<span class="dig">4</span>), <span class="dig">0</span>, -random.randint(<span class="dig">2</span>,<span class="dig">4</span>)]
 
-    Action = [<span class="str">'apple'</span> , <span class="str">'mushroom'</span>]
-    res = random.choice(Action)
-    <span class="kw">print</span> (res + <span class="str">" rolled"</span>)
-    <span class="kw">if</span> res == <span class="str">'apple'</span>:
-        go = exists(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
-        <span class="kw">if</span> go !=  None:
-            <span class="kw">print</span> (<span class="str">"Found apple, clicking"</span>)
-            EatApple(<span class="dig">1</span>)
+    <span class="kw">for</span> i <span class="kw">in</span> range(len(dx)):
+        nx,ny = x+dx[i], y+dy[i]
+        <span class="skw">click</span>(Location(nx,ny))
+        time.<span class="skw">sleep</span>(random.randint(<span class="dig">200</span>,<span class="dig">400</span>)/<span class="dig">1000</span>)
+
+<span class="kw">def</span> vector_transform(x_b, y_b, x_e, y_e, coef):
+    <span class="kw">return</span> x_b+coef*(x_e-x_b), y_b+coef*(y_e-y_b)
+
+<span class="kw">def</span> visitPoint(x,y):
+    a = -<span class="dig">4</span>
+    b = <span class="dig">4</span>
+
+    Taps = random.choice(fewTaps)
+
+    before = True
+    <span class="kw">if</span> random.randint(<span class="dig">1</span>,<span class="dig">5</span>)%<span class="dig">2</span> == <span class="dig">0</span>:
+        before = False
+
+    <span class="kw">if</span> distance(start.getX(), start.getY(), x, y)&lt;<span class="dig">100</span>:
+        before = False
+        Taps = <span class="dig">1</span>
+
+    coef = <span class="dig">0.7</span> <span class="kw">if</span> before <span class="kw">else</span> <span class="dig">1.3</span>
+
+    <span class="kw">for</span> i <span class="kw">in</span> range(Taps):
+        nx, ny = vector_transform(start.getX(), start.getY(), x, y, coef)
+        <span class="kw">print</span>(<span class="str">'Check point:'</span>)
+        <span class="kw">print</span>(start.getX(), start.getY())
+        <span class="kw">print</span>(x,y)
+        <span class="kw">print</span>(coef)
+        <span class="kw">print</span>(nx,ny)
+        <span class="cmt">#raise Exception</span>
+        <span class="skw">click</span>(Location(nx,ny))
+        runner.go((nx,ny))
+        coef -= <span class="dig">0.1</span> <span class="kw">if</span> before <span class="kw">else</span> <span class="dig">0.3</span>
+
+        time.<span class="skw">sleep</span>(random.randint(<span class="dig">200</span>,<span class="dig">400</span>)/<span class="dig">1000</span>)
+
+    <span class="skw">wait</span>(GetDelay(x,y))
+    LastPos = start.getX(),start.getY()
+
+<span class="kw">def</span> checkObjects():
+    <span class="kw">return</span> exists(BTC) <span class="kw">or</span> exists(DRAGON)
+
+<span class="kw">def</span> walkSomewhere():
+    upClosed = False
+    downClosed = False
+    rightClosed = False
+    leftClosed = False
+
+    <span class="kw">for</span> i <span class="kw">in</span> range(<span class="dig">5</span>):
+        runner.anotherWay()
+
+<span class="cmt">#while exists(STATIC):</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="dig">50</span>):
+
+    points = list()
+    <span class="kw">try</span>:
+        <span class="kw">for</span> p <span class="kw">in</span> findAll(BTC):
+            points.append((p.getX(),p.getY()))
+    <span class="kw">except</span>:
+        <span class="kw">pass</span>
+    <span class="kw">try</span>:
+        <span class="kw">for</span> p <span class="kw">in</span> findAll(DRAGON):
+            points.append((p.getX(),p.getY()))
+    <span class="kw">except</span>:
+        <span class="kw">pass</span>
+
+    <span class="kw">if</span> len(points)!=<span class="dig">0</span>:
+        MA, Other = maxArea(points, LastPos[<span class="dig">0</span>], LastPos[<span class="dig">1</span>])
+        toGo = find_best_way(MA, Other, start)
+        <span class="kw">if</span> toGo:
+            visitPoint(toGo[<span class="dig">0</span>],toGo[<span class="dig">1</span>])
         <span class="kw">else</span>:
-             go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.50</span>), <span class="dig">1</span>)
-             <span class="kw">if</span> go !=  None:
-                 <span class="kw">print</span> (<span class="str">"Found mushroom, clicking"</span>)
-                 EatMushroom(<span class="dig">1</span>)
-             <span class="kw">else</span>:
-                 <span class="kw">print</span> (<span class="str">"Nothing found, running"</span>)
-                 RandomRun(<span class="dig">1</span>)
-
+            visitArea(MA)
     <span class="kw">else</span>:
-        go = exists(Pattern(<img src="1548242547155.png" />).similar(<span class="dig">0.50</span>), <span class="dig">1</span>)
-        <span class="kw">if</span> go !=  None:
-            <span class="kw">print</span> (<span class="str">"Found mushroom, clicking"</span>)
-            EatMushroom(<span class="dig">1</span>)
-        <span class="kw">else</span>:
-             go = exists(Pattern(<img src="1548242462659.png" />).similar(<span class="dig">0.85</span>), <span class="dig">1</span>)
-             <span class="kw">if</span> go !=  None:
-                 <span class="kw">print</span> (<span class="str">"Found apple, clicking"</span>)
-                 EatApple(<span class="dig">1</span>)
-             <span class="kw">else</span>:
-                 <span class="kw">print</span> (<span class="str">"Nothing found, running"</span>)
-                 RandomRun(<span class="dig">1</span>)
+        walkSomewhere()
 </pre>
 </body>
 </html>
